@@ -1,0 +1,183 @@
+---
+title: "Titan Case Study"
+date: "Sunday, September 24, 2017"
+output: word_document
+---
+
+The assignment Question is given below:
+
+a. Describe the five per cent significance test you would apply to these data to determine whether new scheme has 
+significantly raised outputs?
+b. What conclusion does the test lead to?
+c. What reservations have you about this result?
+
+d. Suppose it has been calculated that in order for Titan to break even, the average output must increase by £5000. 
+If this figure is alternative hypothesis, what is:
+(i) The probability of a type 1 error?
+(ii) The probability of a type 2 error?
+(iii)The power of the test?
+e. What sample size would make the probabilities of type 1 and type 2 errors equal?
+
+The Titan Insurance Company has just installed a new incentive payment scheme for its lift policy sales force. It wants to have an early view of the success or failure of the new scheme. Indications are that the sales force is selling more policies but sales always vary in an unpredictable pattern from month to month and it is not clear that the scheme has made a significant difference.
+Life Insurance companies typically measure the monthly output of a salesperson as the total sum assured for the policies sold by that person during the month. For example, suppose salesperson X has, in the month, sold seven policies for which the sums assured are £1000, £2500, £3000, £5000, £10000, £35000. X's output for the month is the total of these sums assured, £61,500. Titan's new scheme is that the sales force receives low regular salaries but are paid large bonuses related to their output (i.e. to the total sum assured of policies sold by them). The scheme is expensive for the company but they are looking for sales increases which more than compensate. The agreement with the sales force is that if the scheme does not at least break even for the company, it will be abandoned after six months.
+The scheme has now been in operation for four months. It has settled down after fluctuations in the first two months due to the changeover. To test the effectiveness of the scheme, Titan have taken a random sample of 30 salespeople measured their output in the penultimate month prior to changeover and then measured it in the fourth month after the changeover (they have deliberately chosen months not too close to the changeover).
+The output (£000) of the salespeople are shown in Table 1
+
+
+The output (£000) of the salespeople are shown in Table 1
+
+Table 1
+
+Salesperson | Old Scheme | New Scheme
+----------- | ---------- | -----------
+1. | 57 | 62
+2. | 103 | 122
+3. | 59 | 54
+4. | 75 | 82
+5. | 84 | 84
+6. | 73 | 86
+7. | 35 | 32
+8. | 110 | 104
+9. | 44 | 38
+10. | 82 | 107
+11. | 67 | 84
+12. | 64 | 85
+13. | 78 | 99
+14. | 53 | 39
+15. | 41 | 34
+16. | 39 | 58
+17. | 80 | 73
+18. | 87 | 53
+19. | 73 | 66
+20. | 65 | 78
+21. | 28 | 41
+22. | 62 | 71
+23. | 49 | 38
+24. | 84 | 95
+25. | 63 | 81
+26. | 77 | 58
+27. | 67 | 75
+28. | 101 | 94
+29. | 91 | 100
+30. | 50 | 68
+
+#### Answers
+
+##### a. Describe the five per cent significance test you would apply to these data to determine whether new scheme has significantly raised outputs?
+
+A paired t-test is used to compare population means where you have two samples in which observations in one sample can be paired with observations in the other sample. Examples of where this might occur are:
+•  Before and after observations on the same subjects (e.g. Students' diagnostic test results before and after a particular module or course).
+•	We can use the alternative = "greater" option to specify a one tailed test is a test of significance to determine if there is a relationship between the variables in one direction. In our case, whether new scheme has significantly raised outputs.
+
+##### b. What conclusion does the test lead to?
+
+Assume
+* Mu is the average output from the old scheme.
+* Mu1 is the average output from the new scheme.
+
+Null Hypothesis: H~O~: Mu = Mu1
+Alternative Hypothesis: H~A~: Mu < Mu1
+
+Remember Null hypothesis about the Status Quo and Alternative hypothesis is what the researcher wants to prove.
+
+We shall perform one-tail paired t test as follows:
+
+```{r}
+salesperson      <- seq(1,30)
+
+OldScheme_Output <- c(57,103,59,75,84,73,35,110,44,82,67,64,78,53,41,39,80,87,73,65,28,62,49,84,63,77,67,101,91,50)     
+#
+NewScheme_Output <-c(62,122,54,82,84,86,32,104,38,107,84,85,99,39,34,58,73,53,66,78,41,71,38,95,81,58,75,94,100,68)
+
+t.test(OldScheme_Output,NewScheme_Output, alternative = "less",paired = TRUE, conf.level = 0.95)
+
+```
+
+###### Observation:
+
+Since p-value is 0.06529 and > 0.05 significance level, we accept the null hypothesis at 95% confidence level. 
+
+##### c. What reservations have you about this result?
+
+``` {r}
+var1 <- NewScheme_Output - OldScheme_Output
+
+mu1 <- mean(OldScheme_Output)
+mu2 <- mean(NewScheme_Output)
+
+sd1 <- sd(var1)
+
+d1 <-  (mu1 - mu2)/ sd1
+
+cat("\n Mean 1 = ",mu1,"Mean 2 = ", mu2, "sd = ",sd1,"\n")
+
+library(pwr)
+
+pwr.t.test(n =length(NewScheme_Output), d = d1, sig.level = 0.05, alternative = "less", type = "paired")
+
+
+```
+
+###### Observation
+
+We observe that the p-value is close to significance level meaning that if you set the significance level at 10%, we have to reject the null hypothesis.
+
+Power of the test is 0.45
+So, Probability of type 2 error is 1 - Power = 0.55 which is very high!!
+
+##### d. Suppose it has been calculated that in order for Titan to break even, the average output must increase by £5000. 
+
+##### If this figure is alternative hypothesis, what is:
+
+``` {r}
+diff_mu1 <- 0
+diff_mu2 <- 5
+
+var1 <- NewScheme_Output - OldScheme_Output
+sd1 <- sd(var1)
+
+d1 <-  (diff_mu1 - diff_mu2)/ sd1
+
+pwr.t.test(n =length(NewScheme_Output), d = d1, sig.level = 0.05, alternative = "less", type = "paired")
+```
+
+##### (i) The probability of a type 1 error?
+
+A Type I error occurs when the researcher rejects a null hypothesis when it is true.
+
+**It is same as the significance level and it is 5%**
+
+##### (iii)The power of the test?
+
+A test's power is the probability of correctly rejecting the null hypothesis when it is false; a test's power is influenced by the choice of significance level for the test, the size of the effect being measured, and the amount of data available.
+
+**Power of the test = 60%** 
+
+##### (ii) The probability of a type 2 error? 
+
+A Type II error occurs when the researcher fails to reject a null hypothesis when it is false.
+
+**Probability of Type 2 error = 1 - Power = 1 - 0.60 = 0.40 = 40%**
+
+
+##### (ii) e. What sample size would make the probabilities of type 1 and type 2 errors equal?
+
+By substituting n=Null in the power.t.test function in R, we can calculate the sample size for 
+this scenario.
+
+Note: In this case, significance level = 0.05 and probability of type 2 error is 0.05 and hence the power = 1 - 0.05 = 0.95
+
+``` {r}
+power.t.test(n=NULL,delta =5,sd=sd1,sig.level = 0.05,power = 0.95,
+type ="paired",alternative ="one.sided")
+```
+
+###### Observation
+
+Probabilities of Type I and Type II errors will be make equal when the sample size (n) is approximately 87
+
+
+
+
+
+
